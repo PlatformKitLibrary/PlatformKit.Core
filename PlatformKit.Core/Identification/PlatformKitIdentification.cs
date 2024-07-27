@@ -25,19 +25,20 @@
 using System;
 using System.Reflection;
 
-namespace PlatformKit.Core.Identification;
-
-/// <summary>
-/// 
-/// </summary>
-public class PlatformKitIdentification
+namespace PlatformKit.Core.Identification
 {
     /// <summary>
-    /// Return the version of PlatformKit being run.
+    /// 
     /// </summary>
-    /// <returns></returns>
-    public static Version GetPlatformKitVersion()
+    public class PlatformKitIdentification
     {
-        return Assembly.GetExecutingAssembly().GetName().Version ?? throw new NullReferenceException();
+        /// <summary>
+        /// Return the version of PlatformKit being run.
+        /// </summary>
+        /// <returns></returns>
+        public static Version GetPlatformKitVersion()
+        {
+            return Assembly.GetExecutingAssembly().GetName().Version ?? throw new NullReferenceException();
+        }
     }
 }

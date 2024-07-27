@@ -3,11 +3,14 @@
     <PropertyGroup>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net8.0;netstandard2.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="AlastairLundy.Extensions.System" Version="5.*" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="PlatformKit.Extensions.OperatingSystem" Version="1.*" />
     </ItemGroup>
 
     <ItemGroup>

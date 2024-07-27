@@ -54,7 +54,7 @@ namespace PlatformKit.Core
 #if NET5_0_OR_GREATER
         [SupportedOSPlatform("windows")]
 #endif
-        public static string RunProcessOnWindows(string executableLocation, string executableName, string arguments = "", ProcessStartInfo? processStartInfo = null,
+        public static string RunProcessOnWindows(string executableLocation, string executableName, string arguments = "", ProcessStartInfo processStartInfo = null,
             bool runAsAdministrator = false, bool insertExeInExecutableNameIfMissing = true,
             ProcessWindowStyle windowStyle = ProcessWindowStyle.Normal)
         {
@@ -128,9 +128,13 @@ namespace PlatformKit.Core
         /// <param name="executableLocation">The working directory of the executable.</param>
         /// <param name="executableName">The name of the file to be run.</param>
         /// <param name="processArguments">Arguments to be passed to the executable.</param>
-        public static string RunProcessOnMac(string executableLocation, string executableName, string arguments = "", ProcessStartInfo? processStartInfo = null)
+        public static string RunProcessOnMac(string executableLocation, string executableName, string arguments = "", ProcessStartInfo processStartInfo = null)
         {
+#if NET5_0_OR_GREATER
             ProcessStartInfo? procStartInfo = new ProcessStartInfo
+#else
+            ProcessStartInfo procStartInfo = new ProcessStartInfo
+#endif
             {
                 WorkingDirectory = executableLocation,
                 FileName = executableName,
@@ -170,9 +174,13 @@ namespace PlatformKit.Core
         /// <param name="arguments">Arguments to be passed to the executable.</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static string RunProcessOnLinux(string executableLocation, string executableName, string arguments = "", ProcessStartInfo? processStartInfo = null)
+        public static string RunProcessOnLinux(string executableLocation, string executableName, string arguments = "", ProcessStartInfo processStartInfo = null)
         {
-            ProcessStartInfo? procStartInfo;
+#if NET5_0_OR_GREATER
+            ProcessStartInfo? procStartInfo = new ProcessStartInfo();
+#else
+            ProcessStartInfo procStartInfo;
+#endif
                 
             if (processStartInfo == null)
             {
@@ -209,7 +217,7 @@ namespace PlatformKit.Core
         /// <param name="executableName">The name of the file to be run.</param>
         /// <param name="arguments">Arguments to be passed to the executable.</param>
         /// <returns></returns>
-        public static string RunProcessOnFreeBsd(string executableLocation, string executableName, string arguments = "", ProcessStartInfo? processStartInfo = null)
+        public static string RunProcessOnFreeBsd(string executableLocation, string executableName, string arguments = "", ProcessStartInfo processStartInfo = null)
         {
             return RunProcessOnLinux(executableLocation, executableName, arguments, processStartInfo);
         }

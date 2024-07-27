@@ -22,22 +22,23 @@
        SOFTWARE.
    */
 
-namespace PlatformKit.Core.Identification.Enums;
-
-/// <summary>
-/// The type of RuntimeIdentifier generated or detected.
-/// </summary>
-public enum RuntimeIdentifierType
+namespace PlatformKit.Core.Identification.Enums
 {
-    AnyGeneric,
-    Generic,
-    Specific,
     /// <summary>
-    /// This is meant for Linux use only. DO NOT USE ON WINDOWS or MAC.
+    /// The type of RuntimeIdentifier generated or detected.
     /// </summary>
-    DistroSpecific,
-    /// <summary>
-    /// This is meant for Linux use only. DO NOT USE ON WINDOWS or MAC.
-    /// </summary>
-    VersionLessDistroSpecific
+    public enum RuntimeIdentifierType
+    {
+        AnyGeneric,
+        Generic,
+        Specific,
+        /// <summary>
+        /// This is meant for Linux use only. DO NOT USE ON WINDOWS or MAC.
+        /// </summary>
+        DistroSpecific,
+        /// <summary>
+        /// This is meant for Linux use only. DO NOT USE ON WINDOWS or MAC.
+        /// </summary>
+        VersionLessDistroSpecific
+    }
 }

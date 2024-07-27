@@ -22,11 +22,12 @@
        SOFTWARE.
    */
 
-namespace PlatformKit.Core.Identification.Enums;
-
-public enum TargetFrameworkMonikerType
+namespace PlatformKit.Core.Identification.Enums
 {
-    Generic,
-    OperatingSystemSpecific,
-    OperatingSystemVersionSpecific
+    public enum TargetFrameworkMonikerType
+    {
+        Generic,
+        OperatingSystemSpecific,
+        OperatingSystemVersionSpecific
+    }
 }

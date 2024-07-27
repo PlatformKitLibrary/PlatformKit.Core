@@ -28,73 +28,79 @@ using System.Runtime.Versioning;
 
 using PlatformKit.Core.Internal.Localizations;
 
-namespace PlatformKit.Core.OperatingSystems;
+#if NETSTANDARD2_0
+using OperatingSystem = PlatformKit.Extensions.OperatingSystem.OperatingSystemExtension;
+#endif
 
-public class LinuxOperatingSystem
+namespace PlatformKit.Core.OperatingSystems
 {
-    /// <summary>
-    /// Detects the linux kernel version to string.
-    /// </summary>
-    /// <returns>the linux kernel version as a C# Version object.</returns>
-    /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Linux based Operating System.</exception>
+
+    public class LinuxOperatingSystem
+    {
+        /// <summary>
+        /// Detects the linux kernel version.
+        /// </summary>
+        /// <returns>the linux kernel version as a C# Version object.</returns>
+        /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Linux based Operating System.</exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("linux")]
 #endif
-    public static Version GetLinuxKernelVersion()
-    {
-        if (OperatingSystem.IsLinux())
+        public static Version GetLinuxKernelVersion()
         {
-            return Version.Parse(Environment.OSVersion.ToString()
-                .Replace("Unix ", string.Empty));
-        }
-        else
-        {
-            throw new PlatformNotSupportedException(Resources.Exceptions_PlatformNotSupported_LinuxOnly);
-        }
-    }
-
-    internal static string GetOsReleasePropertyValue(string propertyName)
-    {
-        if (OperatingSystem.IsLinux())
-        {
-            string output = string.Empty;
-            
-            string[] osReleaseInfo = File.ReadAllLines("/etc/os-release");
-            
-            foreach (string s in osReleaseInfo)
+            if (OperatingSystem.IsLinux())
             {
-                if (s.ToUpper().StartsWith(propertyName))
-                {
-                    output = s.Replace(propertyName, string.Empty);
-                }
+                return Version.Parse(Environment.OSVersion.ToString()
+                    .Replace("Unix ", string.Empty));
             }
+            else
+            {
+                throw new PlatformNotSupportedException(Resources.Exceptions_PlatformNotSupported_LinuxOnly);
+            }
+        }
 
-            return output;
-        }
-        else
+        internal static string GetOsReleasePropertyValue(string propertyName)
         {
-            throw new PlatformNotSupportedException(Resources.Exceptions_PlatformNotSupported_LinuxOnly);
-        }
-    }
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="PlatformNotSupportedException"></exception>
-    public static Version GetLinuxDistributionVersion()
-    {
-        if (OperatingSystem.IsLinux())
-        {
-            string versionString = GetOsReleasePropertyValue("VERSION=").Replace("LTS", string.Empty);
-            
-            Version output = Version.Parse(versionString);
+            if (OperatingSystem.IsLinux())
+            {
+                string output = string.Empty;
 
-            return output;
+                string[] osReleaseInfo = File.ReadAllLines("/etc/os-release");
+
+                foreach (string s in osReleaseInfo)
+                {
+                    if (s.ToUpper().StartsWith(propertyName))
+                    {
+                        output = s.Replace(propertyName, string.Empty);
+                    }
+                }
+
+                return output;
+            }
+            else
+            {
+                throw new PlatformNotSupportedException(Resources.Exceptions_PlatformNotSupported_LinuxOnly);
+            }
         }
-        else
+
+        /// <summary>
+        /// Returns the linux distribution version.
+        /// </summary>
+        /// <returns>the linux distribution version as a C# Version object.</returns>
+        /// <exception cref="PlatformNotSupportedException">Thrown if not run on a Linux based operating system.</exception>
+        public static Version GetLinuxDistributionVersion()
         {
-            throw new PlatformNotSupportedException(Resources.Exceptions_PlatformNotSupported_LinuxOnly);
+            if (OperatingSystem.IsLinux())
+            {
+                string versionString = GetOsReleasePropertyValue("VERSION=").Replace("LTS", string.Empty);
+
+                Version output = Version.Parse(versionString);
+
+                return output;
+            }
+            else
+            {
+                throw new PlatformNotSupportedException(Resources.Exceptions_PlatformNotSupported_LinuxOnly);
+            }
         }
     }
 }

@@ -35,8 +35,9 @@ using PlatformKit.Core.OperatingSystems;
     using OperatingSystem = PlatformKit.Extensions.OperatingSystem.OperatingSystemExtension;
 #endif
 
-namespace PlatformKit.Core.Identification;
-
+    namespace PlatformKit.Core.Identification
+    {
+        
 /// <summary>
 /// A class to manage RuntimeId detection and programmatic generations
 /// </summary>
@@ -251,4 +252,5 @@ public class TargetFrameworkIdentification
 
             throw new PlatformNotSupportedException();
         }
+    }
 }

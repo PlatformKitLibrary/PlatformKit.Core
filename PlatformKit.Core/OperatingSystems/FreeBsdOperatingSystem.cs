@@ -24,25 +24,30 @@
 
 using System;
 
-namespace PlatformKit.Core.OperatingSystems;
+#if NETSTANDARD2_0
+using OperatingSystem = PlatformKit.Extensions.OperatingSystem.OperatingSystemExtension;
+#endif
 
-public class FreeBsdOperatingSystem
+namespace PlatformKit.Core.OperatingSystems
 {
-    // ReSharper disable once InconsistentNaming
-    /// <summary>
-    /// Detects and Returns the Installed version of FreeBSD
-    /// </summary>
-    /// <returns></returns>
-    public static Version GetFreeBSDVersion()
+    public class FreeBsdOperatingSystem
     {
-        if (OperatingSystem.IsFreeBSD())
+        // ReSharper disable once InconsistentNaming
+        /// <summary>
+        /// Detects and Returns the Installed version of FreeBSD
+        /// </summary>
+        /// <returns></returns>
+        public static Version GetFreeBSDVersion()
         {
-            string versionString = CommandRunner.RunCommandOnFreeBsd("uname -v").Replace("FreeBSD", string.Empty)
-                .Split(' ')[0].Replace("-release", string.Empty);
+            if (OperatingSystem.IsFreeBSD())
+            {
+                string versionString = CommandRunner.RunCommandOnFreeBsd("uname -v").Replace("FreeBSD", string.Empty)
+                    .Split(' ')[0].Replace("-release", string.Empty);
             
-            return Version.Parse(versionString);
-        }
+                return Version.Parse(versionString);
+            }
 
-        throw new PlatformNotSupportedException();
+            throw new PlatformNotSupportedException();
+        }
     }
 }

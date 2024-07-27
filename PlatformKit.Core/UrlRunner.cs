@@ -30,77 +30,79 @@ using System.Threading.Tasks;
     using OperatingSystem = PlatformKit.Extensions.OperatingSystem.OperatingSystemExtension;
 #endif
 
-namespace PlatformKit.Core;
-
-public class UrlRunner
+namespace PlatformKit.Core
 {
-    /// <summary>
-    /// Convert HTTP to HTTPS
-    /// </summary>
-    /// <param name="url"></param>
-    /// <returns></returns>
-    protected static string MakeUrlSecure(string url)
+            
+    public class UrlRunner
     {
-        if (url.StartsWith("http://"))
+        /// <summary>
+        /// Convert HTTP to HTTPS
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        protected static string MakeUrlSecure(string url)
         {
-            url = url.Replace("http://", "https://");
-        }
-        else if (url.StartsWith("www."))
-        {
-            url = url.Replace("http://www.", "https://www.");
-        }
-
-        return url;
-    }
-
-    /// <summary>
-    /// Open a URL in the default browser.
-    /// Courtesy of https://github.com/dotnet/corefx/issues/10361
-    /// </summary>
-    /// <param name="url">The URL to be opened.</param>
-    public static void OpenUrlInDefaultBrowser(string url)
-    {
-        url = UrlHttpFormatting(url, false);
-        url = MakeUrlSecure(url);
-        
-        OpenUrl(url);
-    }
-
-    protected static void OpenUrl(string url)
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            CommandRunner.RunCmdCommand($"/c start {url.Replace("&", "^&")}", new ProcessStartInfo { CreateNoWindow = true});
-        }
-        if (OperatingSystem.IsLinux())
-        {
-            CommandRunner.RunCommandOnLinux($"xdg-open {url}");
-        }
-        if (OperatingSystem.IsMacOS())
-        {
-            Task task = new Task(() => Process.Start("open", url));
-            task.Start();
-        }
-        if (OperatingSystem.IsFreeBSD())
-        {
-            CommandRunner.RunCommandOnFreeBsd($"xdg-open {url}");
-        }
-    }
-
-    protected static string UrlHttpFormatting(string url, bool allowNonSecureHttp)
-    {
-        if ((!url.StartsWith("https://") || !url.StartsWith("www.")) && (!url.StartsWith("file://")))
-        {
-            if (allowNonSecureHttp)
+            if (url.StartsWith("http://"))
             {
-                url = "http://" + url;
+                url = url.Replace("http://", "https://");
             }
-            else
+            else if (url.StartsWith("www."))
             {
-                url = MakeUrlSecure(url);
+                url = url.Replace("http://www.", "https://www.");
+            }
+
+            return url;
+        }
+
+        /// <summary>
+        /// Open a URL in the default browser.
+        /// Courtesy of https://github.com/dotnet/corefx/issues/10361
+        /// </summary>
+        /// <param name="url">The URL to be opened.</param>
+        public static void OpenUrlInDefaultBrowser(string url)
+        {
+            url = UrlHttpFormatting(url, false);
+            url = MakeUrlSecure(url);
+            
+            OpenUrl(url);
+        }
+
+        protected static void OpenUrl(string url)
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                CommandRunner.RunCmdCommand($"/c start {url.Replace("&", "^&")}", new ProcessStartInfo { CreateNoWindow = true});
+            }
+            if (OperatingSystem.IsLinux())
+            {
+                CommandRunner.RunCommandOnLinux($"xdg-open {url}");
+            }
+            if (OperatingSystem.IsMacOS())
+            {
+                Task task = new Task(() => Process.Start("open", url));
+                task.Start();
+            }
+            if (OperatingSystem.IsFreeBSD())
+            {
+                CommandRunner.RunCommandOnFreeBsd($"xdg-open {url}");
             }
         }
 
-        return url;
+        protected static string UrlHttpFormatting(string url, bool allowNonSecureHttp)
+        {
+            if ((!url.StartsWith("https://") || !url.StartsWith("www.")) && (!url.StartsWith("file://")))
+            {
+                if (allowNonSecureHttp)
+                {
+                    url = "http://" + url;
+                }
+                else
+                {
+                    url = MakeUrlSecure(url);
+                }
+            }
+
+            return url;
+        }
     }
 }

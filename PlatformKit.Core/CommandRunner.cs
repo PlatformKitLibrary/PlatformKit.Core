@@ -30,148 +30,154 @@ using System.Text;
 
 #if NETSTANDARD2_0
     using OperatingSystem = PlatformKit.Extensions.OperatingSystem.OperatingSystemExtension;
-#endif  
+#endif
 
-namespace PlatformKit.Core;
-
-/// <summary>
-/// 
-/// </summary>
-public static class CommandRunner
-{
-
- /// <summary>
- /// Run a command on macOS located in the /usr/bin/ folder.
- /// </summary>
- /// <param name="command">The command to be run.</param>
- /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
- /// <returns></returns>
- /// <exception cref="PlatformNotSupportedException"></exception>
- public static string RunCommandOnMac(string command, bool runAsAdministrator = false)
+    namespace PlatformKit.Core
     {
-        if (!OperatingSystem.IsMacOS())
-        {
-            throw new PlatformNotSupportedException();
-        }
-        
-        string location = "/usr/bin/";
-                
-        string[] array = command.Split(' ');
 
-        if (array.Length > 1)
+        /// <summary>
+        /// 
+        /// </summary>
+        public static class CommandRunner
         {
-            StringBuilder stringBuilder = new StringBuilder();
 
-            foreach (string argument in array)
+            /// <summary>
+            /// Run a command on macOS located in the /usr/bin/ folder.
+            /// </summary>
+            /// <param name="command">The command to be run.</param>
+            /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
+            /// <returns></returns>
+            /// <exception cref="PlatformNotSupportedException"></exception>
+            public static string RunCommandOnMac(string command, bool runAsAdministrator = false)
             {
-                stringBuilder.Append($"{argument} ");
+                if (!OperatingSystem.IsMacOS())
+                {
+                    throw new PlatformNotSupportedException();
+                }
+
+                string location = "/usr/bin/";
+
+                string[] array = command.Split(' ');
+
+                if (array.Length > 1)
+                {
+                    StringBuilder stringBuilder = new StringBuilder();
+
+                    foreach (string argument in array)
+                    {
+                        stringBuilder.Append($"{argument} ");
+                    }
+
+                    string args = stringBuilder.ToString().Replace(array[0], string.Empty);
+
+                    return ProcessRunner.RunProcessOnMac(location, array[0], args);
+                }
+                else
+                {
+                    if (runAsAdministrator)
+                    {
+                        command = command.Insert(0, "sudo ");
+                    }
+
+                    return ProcessRunner.RunProcessOnMac(location, command);
+                }
+
             }
 
-            string args = stringBuilder.ToString().Replace(array[0], string.Empty);
-                
-            return ProcessRunner.RunProcessOnMac(location, array[0], args);
-        }
-        else
-        {
-            if (runAsAdministrator)
+            /// <summary>
+            /// Run a command or program as if inside a terminal on FreeBSD.
+            /// </summary>
+            /// <param name="command">The command to be run.</param>
+            /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
+            /// <returns></returns>
+            public static string RunCommandOnFreeBsd(string command, bool runAsAdministrator = false)
             {
-                command = command.Insert(0, "sudo ");
+                return RunCommandOnLinux(command, runAsAdministrator);
             }
-                
-            return ProcessRunner.RunProcessOnMac(location, command);
-        }
 
-    }
-
-    /// <summary>
-    /// Run a command or program as if inside a terminal on FreeBSD.
-    /// </summary>
-    /// <param name="command">The command to be run.</param>
-    /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
-    /// <returns></returns>
-    public static string RunCommandOnFreeBsd(string command, bool runAsAdministrator = false)
-    {
-        return RunCommandOnLinux(command, runAsAdministrator);
-    }
-
-    /// <summary>
-    /// Runs commands in the Windows Cmd Command Prompt.
-    /// </summary>
-    /// <param name="command">The command to be run.</param>
-    /// <param name="processStartInfo"></param>
-    /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
-    /// <returns></returns>
+            /// <summary>
+            /// Runs commands in the Windows Cmd Command Prompt.
+            /// </summary>
+            /// <param name="command">The command to be run.</param>
+            /// <param name="processStartInfo"></param>
+            /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
+            /// <returns></returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
 #endif
-    public static string RunCmdCommand(string command, ProcessStartInfo? processStartInfo = null, bool runAsAdministrator = false)
-    {
-        return ProcessRunner.RunProcessOnWindows(Environment.SystemDirectory, "cmd", command, processStartInfo, runAsAdministrator);
-    }
+            public static string RunCmdCommand(string command, ProcessStartInfo processStartInfo = null,
+                bool runAsAdministrator = false)
+            {
+                return ProcessRunner.RunProcessOnWindows(Environment.SystemDirectory, "cmd", command, processStartInfo,
+                    runAsAdministrator);
+            }
 
-    /// <summary>
-    /// Runs commands in Windows Powershell.
-    /// </summary>
-    /// <param name="command">The command to be run.</param>
-    /// <param name="processStartInfo"></param>
-    /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
-    /// <returns></returns>
+            /// <summary>
+            /// Runs commands in Windows Powershell.
+            /// </summary>
+            /// <param name="command">The command to be run.</param>
+            /// <param name="processStartInfo"></param>
+            /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
+            /// <returns></returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
 #endif
-    public static string RunPowerShellCommand(string command, ProcessStartInfo? processStartInfo = null, bool runAsAdministrator = false)
-    {
-        if (!OperatingSystem.IsWindows())
-        {
-            throw new PlatformNotSupportedException();
-        }
-        
-        string location =
-            $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0";
-        return ProcessRunner.RunProcessOnWindows(location, "powershell", command, processStartInfo, runAsAdministrator);
-
-    }
-
-    /// <summary>
-    /// Run a command or program as if inside a terminal on Linux.
-    /// </summary>
-    /// <param name="command">The command to be run.</param>
-    /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
-    /// <returns></returns>
-    public static string RunCommandOnLinux(string command, bool runAsAdministrator = false)
-    {
-        if (!OperatingSystem.IsLinux() && !OperatingSystem.IsFreeBSD())
-        {
-            throw new PlatformNotSupportedException();
-        }
-        
-        string location = "/usr/bin/";
-
-        string[] args = command.Split(' ');
-        command = args[0];
-
-        StringBuilder stringBuilder = new StringBuilder();
-            
-        if (args.Length > 0)
-        {
-            for (int index = 1; index < args.Length; index++)
+            public static string RunPowerShellCommand(string command, ProcessStartInfo processStartInfo = null,
+                bool runAsAdministrator = false)
             {
-                stringBuilder.Append(args[index].Replace(command, string.Empty));
+                if (!OperatingSystem.IsWindows())
+                {
+                    throw new PlatformNotSupportedException();
+                }
+
+                string location =
+                    $"{Environment.SystemDirectory}{Path.DirectorySeparatorChar}System32{Path.DirectorySeparatorChar}WindowsPowerShell{Path.DirectorySeparatorChar}v1.0";
+                return ProcessRunner.RunProcessOnWindows(location, "powershell", command, processStartInfo,
+                    runAsAdministrator);
+
+            }
+
+            /// <summary>
+            /// Run a command or program as if inside a terminal on Linux.
+            /// </summary>
+            /// <param name="command">The command to be run.</param>
+            /// <param name="runAsAdministrator">Whether to run a command as administrator or not.</param>
+            /// <returns></returns>
+            public static string RunCommandOnLinux(string command, bool runAsAdministrator = false)
+            {
+                if (!OperatingSystem.IsLinux() && !OperatingSystem.IsFreeBSD())
+                {
+                    throw new PlatformNotSupportedException();
+                }
+
+                string location = "/usr/bin/";
+
+                string[] args = command.Split(' ');
+                command = args[0];
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                if (args.Length > 0)
+                {
+                    for (int index = 1; index < args.Length; index++)
+                    {
+                        stringBuilder.Append(args[index].Replace(command, string.Empty));
+                    }
+                }
+
+                string processArguments = stringBuilder.ToString();
+
+                if (!Directory.Exists(location))
+                {
+                    throw new DirectoryNotFoundException("Could not find directory " + location);
+                }
+
+                if (runAsAdministrator)
+                {
+                    command = command.Insert(0, "sudo ");
+                }
+
+                return ProcessRunner.RunProcessOnLinux(location, command, processArguments);
             }
         }
-
-        string processArguments = stringBuilder.ToString();
-
-        if (!Directory.Exists(location))
-        {
-            throw new DirectoryNotFoundException("Could not find directory " + location);
-        }
-
-        if (runAsAdministrator)
-        {
-            command = command.Insert(0, "sudo ");
-        }
-                    
-        return ProcessRunner.RunProcessOnLinux(location, command, processArguments);
     }
-}

@@ -28,94 +28,100 @@ using System.Runtime.Versioning;
 
 using AlastairLundy.Extensions.System;
 
-namespace PlatformKit.Core.OperatingSystems;
+#if NETSTANDARD2_0
+using OperatingSystem = PlatformKit.Extensions.OperatingSystem.OperatingSystemExtension;
+#endif
 
-public class WindowsOperatingSystem
+namespace PlatformKit.Core.OperatingSystems
 {
-    /// <summary>
-    /// Detects Windows Version and returns it as a System.Version
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="PlatformNotSupportedException"></exception>
-    // ReSharper disable once MemberCanBePrivate.Global
-#if NET5_0_OR_GREATER
-    [SupportedOSPlatform("windows")]
-#endif
-    public static Version GetWindowsVersion()
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            return Version.Parse(RuntimeInformation.OSDescription
-                .Replace("Microsoft Windows", string.Empty)
-                .Replace(" ", string.Empty));
-        }
 
-        throw new PlatformNotSupportedException();
-    }
-        
-    /// <summary>
-    /// Returns whether a specified version of Windows is Windows 10.
-    /// </summary>
-    /// <returns>true if a version of Windows is Windows 10</returns>
+    public class WindowsOperatingSystem
+    {
+        /// <summary>
+        /// Detects Windows Version and returns it as a System.Version
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="PlatformNotSupportedException"></exception>
+        // ReSharper disable once MemberCanBePrivate.Global
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
 #endif
-    public static bool IsWindows10()
-    {
-        if (OperatingSystem.IsWindows())
+        public static Version GetWindowsVersion()
         {
-            return IsWindows10(GetWindowsVersion());
-        }
-        else
-        {
+            if (OperatingSystem.IsWindows())
+            {
+                return Version.Parse(RuntimeInformation.OSDescription
+                    .Replace("Microsoft Windows", string.Empty)
+                    .Replace(" ", string.Empty));
+            }
+
             throw new PlatformNotSupportedException();
         }
-    }
-    
-    /// <summary>
-    /// Returns whether a specified version of Windows is Windows 10.
-    /// </summary>
-    /// <returns>true if a version of Windows is Windows 10</returns>
+
+        /// <summary>
+        /// Returns whether a specified version of Windows is Windows 10.
+        /// </summary>
+        /// <returns>true if a version of Windows is Windows 10</returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
 #endif
-    public static bool IsWindows10(Version version)
-    {
-        return version.IsAtLeast(new Version(10, 0, 10240)) 
+        public static bool IsWindows10()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                return IsWindows10(GetWindowsVersion());
+            }
+            else
+            {
+                throw new PlatformNotSupportedException();
+            }
+        }
+
+        /// <summary>
+        /// Returns whether a specified version of Windows is Windows 10.
+        /// </summary>
+        /// <returns>true if a version of Windows is Windows 10</returns>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+#endif
+        public static bool IsWindows10(Version version)
+        {
+            return version.IsAtLeast(new Version(10, 0, 10240))
                    && version.IsOlderThan(new Version(10, 0, 20349));
-    }
+        }
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="PlatformNotSupportedException"></exception>
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="PlatformNotSupportedException"></exception>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
 #endif
-    public static bool IsWindows11()
-    {
-        if (OperatingSystem.IsWindows())
+        public static bool IsWindows11()
         {
-            return IsWindows11(GetWindowsVersion());
+            if (OperatingSystem.IsWindows())
+            {
+                return IsWindows11(GetWindowsVersion());
+            }
+            else
+            {
+                throw new PlatformNotSupportedException();
+            }
         }
-        else
-        {
-            throw new PlatformNotSupportedException();
-        }
-    }
-    
-    /// <summary>
-    /// Returns whether a specified version of Windows is Windows 10.
-    /// </summary>
-    /// <returns>true if a version of Windows is Windows 10</returns>
+
+        /// <summary>
+        /// Returns whether a specified version of Windows is Windows 10.
+        /// </summary>
+        /// <returns>true if a version of Windows is Windows 10</returns>
 #if NET5_0_OR_GREATER
     [SupportedOSPlatform("windows")]
 #endif
-    public static bool IsWindows11(Version version)
-    {
-        return version.IsAtLeast(new Version(10, 0, 22000)) 
-               && version.IsOlderThan(new Version(10, 0, 27000));
+        public static bool IsWindows11(Version version)
+        {
+            return version.IsAtLeast(new Version(10, 0, 22000))
+                   && version.IsOlderThan(new Version(10, 0, 27000));
+        }
     }
 }

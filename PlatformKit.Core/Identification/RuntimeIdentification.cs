@@ -57,6 +57,7 @@ namespace PlatformKit.Core.Identification
         /// <exception cref="PlatformNotSupportedException"></exception>
         protected static string GetArchitectureString()
         {
+#if NET5_0_OR_GREATER
             return RuntimeInformation.OSArchitecture switch
             {
                 Architecture.X64 => "x64",
@@ -69,6 +70,21 @@ namespace PlatformKit.Core.Identification
 #endif
                 _ => null
             } ?? throw new InvalidOperationException();
+#else
+            switch (RuntimeInformation.OSArchitecture)
+            {
+                case Architecture.Arm:
+                    return "arm";
+                case Architecture.Arm64:
+                    return "arm64";
+                case Architecture.X64:
+                    return "x64";
+                case Architecture.X86:
+                    return "x86";
+                default:
+                    throw new PlatformNotSupportedException();
+            }
+#endif
         }
 
         /// <summary>
@@ -78,8 +94,12 @@ namespace PlatformKit.Core.Identification
         /// <returns></returns>
         protected static string GetOsNameString(RuntimeIdentifierType identifierType)
         {
+#if NET5_0_OR_GREATER
             string? osName = null;
-
+#else
+            string osName = null;
+#endif
+            
             if (identifierType == RuntimeIdentifierType.AnyGeneric)
             {
                 osName = "any";
@@ -151,10 +171,13 @@ namespace PlatformKit.Core.Identification
         /// </summary>
         /// <returns></returns>
         /// <exception cref="PlatformNotSupportedException"></exception>
-        internal static string? GetOsVersionString()
+        internal static string GetOsVersionString()
         {
+#if NET5_0_OR_GREATER
             string? osVersion = null;
-
+#else
+            string osVersion = null;
+#endif
             if (OperatingSystem.IsWindows())
             {
                 bool isWindows10 = WindowsOperatingSystem.IsWindows10();
@@ -170,6 +193,7 @@ namespace PlatformKit.Core.Identification
                 }
                 else if (!isWindows10 && !isWindows11)
                 {
+#if NET5_0_OR_GREATER
                     osVersion = WindowsOperatingSystem.GetWindowsVersion().Build switch
                     {
                         < 9200 => throw new PlatformNotSupportedException(),
@@ -177,6 +201,20 @@ namespace PlatformKit.Core.Identification
                         9600 => "81",
                         _ => throw new PlatformNotSupportedException(Resources.Exceptions_PlatformNotSupported_WindowsOnly)
                     };
+#else
+                    switch (WindowsOperatingSystem.GetWindowsVersion().Build)
+                    {
+                        case 9200:
+                            osVersion = "8";
+                            break;
+                        case 9600:
+                            osVersion = "81";
+                            break;
+                        default:
+                            throw new PlatformNotSupportedException(Resources
+                                .Exceptions_PlatformNotSupported_WindowsOnly);
+                    }
+#endif
                 }
             }
             if (OperatingSystem.IsLinux())
@@ -286,7 +324,7 @@ namespace PlatformKit.Core.Identification
                 OperatingSystem.IsLinux() && identifierType == RuntimeIdentifierType.DistroSpecific ||
                 OperatingSystem.IsLinux() && identifierType == RuntimeIdentifierType.VersionLessDistroSpecific)
             {
-                string? osVersion = GetOsVersionString();
+                string osVersion = GetOsVersionString();
 
                 if (OperatingSystem.IsWindows())
                 {
@@ -324,7 +362,7 @@ namespace PlatformKit.Core.Identification
                     return $"{osName}-{cpuArch}";
                 }
             }
-            else if((!OperatingSystem.IsLinux() && !OperatingSystem.IsFreeBSD()) && identifierType is (RuntimeIdentifierType.DistroSpecific or RuntimeIdentifierType.VersionLessDistroSpecific))
+            else if((!OperatingSystem.IsLinux() && !OperatingSystem.IsFreeBSD()) && (identifierType == RuntimeIdentifierType.DistroSpecific || identifierType == RuntimeIdentifierType.VersionLessDistroSpecific))
             {
                 Console.WriteLine(Resources.RuntimeInformation_NonLinuxSpecific_Warning);
                 return GenerateRuntimeIdentifier(RuntimeIdentifierType.Specific);
